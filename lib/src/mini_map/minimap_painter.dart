@@ -6,7 +6,6 @@ class MinimapPainter extends CustomPainter {
   final int playerLevel;
   final List<GameItem> items;
   final Size gameWorldSize;
-  final double minimapSize;
   final Offset cameraOffset;
   final Size screenSize;
 
@@ -17,7 +16,6 @@ class MinimapPainter extends CustomPainter {
     required this.gameWorldSize,
     required this.cameraOffset,
     required this.screenSize,
-    this.minimapSize = 100.0,
   });
 
   @override

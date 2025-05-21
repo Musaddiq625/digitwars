@@ -255,7 +255,6 @@ class _GameScreenUIState extends State<GameScreenUI>
                       playerLevel: widget.playerPower,
                       items: widget.items,
                       gameWorldSize: widget.gameWorldSize,
-                      minimapSize: widget.minimapSize,
                       cameraOffset: widget.cameraOffset,
                       screenSize: mediaQuery.size,
                     ),
