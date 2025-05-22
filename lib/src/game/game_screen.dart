@@ -379,8 +379,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
     for (int i = 0; i < enemiesPerLevel; i++) {
       final itemPoints = baseLevel + i; // Generate sequential levels
-      // Use getHoleSizeForLevel to determine enemy size based on level
-      final calculatedItemSize = getHoleSizeForLevel(itemPoints) / 3;
+      final powerOffset = itemPoints - smallestItemPoints;
+      final sizeFactor = powerOffset / _maxItemPowerOffset;
+      var calculatedItemSize =
+          minItemSize + (maxItemSize - minItemSize) * sizeFactor;
+      calculatedItemSize = calculatedItemSize.clamp(minItemSize, maxItemSize);
 
       var validPosition = false;
       var attempts = 0;
