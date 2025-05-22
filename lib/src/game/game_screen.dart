@@ -14,10 +14,12 @@ import 'package:flutter/material.dart';
 class GameScreen extends StatefulWidget {
   final int selectedTheme;
   final int enemiesInput;
+  final bool isInfiniteGame;
 
   const GameScreen({
     required this.selectedTheme,
     required this.enemiesInput,
+    required this.isInfiniteGame,
     super.key,
   });
 
@@ -88,7 +90,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   // e.g., 0.2 means a 20% margin from each screen edge, resulting in a 50% wide/high dead zone in the center.
   static const double _cameraDeadZoneFactor = 0.2;
   // Max additional points an item can have over smallestItemPoints (e.g., 0, 1, 2)
-  static const int _maxItemPowerOffset = 2;
+  static const int _maxItemPowerOffset = 4; // Changed from 2 to 4
   // Add animation controller for progress indicator
   late AnimationController _progressAnimationController;
   late Animation<double> _progressAnimation;
@@ -252,12 +254,34 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
     // Calculate the number of power levels
     const numPowerLevels = _maxItemPowerOffset + 1;
-    final itemsPerPower = (count / numPowerLevels).floor();
-    final remainder = count % numPowerLevels;
+
+    // Calculate progression tier based on player level
+    final currentTier = ((_playerPower - 1) / 2).floor();
+    final progressionFactor = currentTier * 0.15; // 15% increase per tier
+
+    // Calculate dynamic weights with progression scaling
+    int totalWeight = 0;
+    final levelWeights = List.generate(numPowerLevels, (powerOffset) {
+      final baseWeight =
+          (numPowerLevels - powerOffset) *
+          (1 + powerOffset * progressionFactor);
+      return baseWeight.toInt();
+    });
+
+    totalWeight = levelWeights.reduce((a, b) => a + b);
 
     var itemIndex = 0;
     for (var powerOffset = 0; powerOffset < numPowerLevels; powerOffset++) {
-      final itemsThisPower = itemsPerPower + (powerOffset < remainder ? 1 : 0);
+      // Calculate items for this level using progressive weights
+      var itemsThisPower =
+          ((count * levelWeights[powerOffset]) / totalWeight).round();
+
+      // Ensure minimum of 2 items for previous tiers
+      if (powerOffset <= currentTier + 1) {
+        itemsThisPower = itemsThisPower.clamp(2, count);
+      }
+
+      //  itemsThisPower = itemsPerPower + (powerOffset < remainder ? 1 : 0);
       final itemPointsValue = smallestItemPoints + powerOffset;
 
       // Determine item size based on its points
@@ -266,7 +290,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               ? 0.0
               : powerOffset.toDouble() / _maxItemPowerOffset.toDouble();
       var calculatedItemSize =
-          minItemSize + (maxItemSize - minItemSize) * sizeFactor;
+          minItemSize +
+          (maxItemSize - minItemSize) * sizeFactor * itemPointsValue;
       calculatedItemSize = calculatedItemSize.clamp(minItemSize, maxItemSize);
       // Safety check
       if (calculatedItemSize <= 0) calculatedItemSize = minItemSize;
@@ -341,8 +366,84 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     });
   }
 
+  void _spawnHigherLevelEnemies() {
+    const enemiesPerLevel = 5;
+    final newItems = <GameItem>[];
+
+    final worldWidth = _gameWorldSize.width;
+    final worldHeight = _gameWorldSize.height;
+
+    // Base new enemies on player's current level +1, with minimum level 3
+    int baseLevel = _playerPower + 1;
+    if (baseLevel < 3) baseLevel = 3; // Ensure minimum level 3
+
+    for (int i = 0; i < enemiesPerLevel; i++) {
+      final itemPoints = baseLevel + i; // Generate sequential levels
+      // Use getHoleSizeForLevel to determine enemy size based on level
+      final calculatedItemSize = getHoleSizeForLevel(itemPoints) / 3;
+
+      var validPosition = false;
+      var attempts = 0;
+      const maxAttempts = 20;
+      double x, y;
+
+      do {
+        final edgeBufferX = worldWidth * 0.05;
+        final edgeBufferY = worldHeight * 0.05;
+
+        x =
+            edgeBufferX +
+            calculatedItemSize +
+            _random.nextDouble() *
+                (worldWidth - 2 * edgeBufferX - calculatedItemSize * 2);
+        y =
+            edgeBufferY +
+            calculatedItemSize +
+            _random.nextDouble() *
+                (worldHeight - 2 * edgeBufferY - calculatedItemSize * 2);
+
+        validPosition = true;
+        final newItemRadius = calculatedItemSize;
+
+        // Check collisions with existing items
+        for (final existingItem in [..._items, ...newItems]) {
+          final distance = (existingItem.position - Offset(x, y)).distance;
+          if (distance < (existingItem.size + newItemRadius + 10)) {
+            validPosition = false;
+            break;
+          }
+        }
+
+        // Check distance from player
+        if (_holePosition != null) {
+          final distanceToHole = (Offset(x, y) - _holePosition!).distance;
+          if (distanceToHole < _playerHoleRadius + newItemRadius + 20) {
+            validPosition = false;
+          }
+        }
+
+        attempts++;
+      } while (!validPosition && attempts < maxAttempts);
+
+      newItems.add(
+        GameItem(
+          id: 'enemy_${DateTime.now().millisecondsSinceEpoch}_$i',
+          position: Offset(x, y),
+          size: calculatedItemSize,
+          points: itemPoints,
+          color: Colors.primaries[_random.nextInt(Colors.primaries.length)]
+              .withOpacity(0.8),
+          verticalOffset: _random.nextDouble() * 2 * pi,
+          pulseScale: 0.8 + _random.nextDouble() * 0.4,
+        ),
+      );
+    }
+
+    setState(() => _items.addAll(newItems));
+  }
+
   // Function to check for collisions and consume items
-  void _checkCollisionsAndConsumeItems() {
+  void _checkCollisionsAndConsumeItems({bool isInfinite = false}) {
     if (_holePosition == null) return;
 
     final itemsToRemove = <GameItem>[];
@@ -382,7 +483,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         itemsToRemove.add(item);
         _playerScore += item.points;
         _playerScoreView += item.points;
-         setState(() {});
+        setState(() {});
         if (isInvulnerable) {
           isInvulnerable = false;
           setState(() {});
@@ -399,7 +500,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
           _playerScore -= requiredScoreToGrow;
           _playerPower++;
 
-          final targetSize = _playerHoleSize + 10.0;
+          // Add new enemies when leveling up
+          if (isInfinite) _spawnHigherLevelEnemies();
+
+          final targetSize = getHoleSizeForLevel(_playerPower);
           _holeSizeAnimation = Tween<double>(
             begin: _playerHoleSize,
             end: targetSize,
@@ -616,7 +720,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       );
 
       _updateCameraPosition(); // Update camera based on new hole position
-      _checkCollisionsAndConsumeItems(); // Check for collisions after moving
+      _checkCollisionsAndConsumeItems(
+        isInfinite: widget.isInfiniteGame,
+      ); // Check for collisions after moving
     });
   }
 
@@ -657,4 +763,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       resumeTimer: resumeTimer,
     );
   }
+}
+
+// Add this function to _GameScreenState
+double getHoleSizeForLevel(int level) {
+  // You can tweak these constants as needed
+  const double baseSize = 32.0; // Minimum hole size (diameter)
+  const double sizeIncrement = 10.0; // How much size increases per level
+  return baseSize + (level - 1) * sizeIncrement;
 }

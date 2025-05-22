@@ -13,6 +13,7 @@ class StartScreen extends StatefulWidget {
 class _StartScreenState extends State<StartScreen> {
   int _selectedTheme = 0;
   int _enemiesInput = initialItemsList.first;
+  bool isInfiniteSelected = false;
 
   void _handleThemeSelection(int themeIndex) {
     setState(() {
@@ -64,16 +65,36 @@ class _StartScreenState extends State<StartScreen> {
                                 color: Colors.white,
                               ),
                               checkmarkColor: Colors.white,
-                              selected: _enemiesInput == e,
+                              selected:
+                                  _enemiesInput == e && !isInfiniteSelected,
                               selectedColor: themes[_selectedTheme][0],
                               onSelected:
-                                  (_) => setState(() => _enemiesInput = e),
+                                  (_) => setState(() {
+                                    isInfiniteSelected = false;
+                                    _enemiesInput = e;
+                                  }),
                             ),
                           ),
                         ),
                       ],
                     ),
-
+                    const SizedBox(height: 32),
+                    ChoiceChip(
+                      label: const Text('INFINITE MODE'),
+                      selected: isInfiniteSelected,
+                      showCheckmark: false,
+                      selectedColor: Colors.red,
+                      labelStyle: TextStyle(
+                        color: Colors.white,
+                        fontWeight: isInfiniteSelected ? FontWeight.bold : null,
+                      ),
+                      iconTheme: const IconThemeData(color: Colors.white),
+                      color: WidgetStateProperty.all<Color>(
+                        isInfiniteSelected ? Colors.red : Colors.black,
+                      ),
+                      onSelected:
+                          (value) => setState(() => isInfiniteSelected = value),
+                    ),
                     const SizedBox(height: 32),
                     ElevatedButton(
                       onPressed:
@@ -83,7 +104,11 @@ class _StartScreenState extends State<StartScreen> {
                               duration: const Duration(milliseconds: 700),
                               child: GameScreen(
                                 selectedTheme: _selectedTheme,
-                                enemiesInput: _enemiesInput,
+                                enemiesInput:
+                                    isInfiniteSelected
+                                        ? initialItemsList[1]
+                                        : _enemiesInput,
+                                isInfiniteGame: isInfiniteSelected,
                               ),
                             ),
                           ),
