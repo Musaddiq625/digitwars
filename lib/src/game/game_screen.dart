@@ -3,6 +3,8 @@ import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:math';
 
+import 'package:digitwars_io/src/dialogs/game_over_dialog.dart';
+import 'package:digitwars_io/src/dialogs/life_warning_dialog.dart';
 import 'package:digitwars_io/src/game/game_screen_ui.dart';
 import 'package:digitwars_io/src/dialogs/help_dialog.dart';
 import 'package:digitwars_io/src/dialogs/success_dialog.dart';
@@ -447,6 +449,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     setState(() => _items.addAll(newItems));
   }
 
+  // Show life warning dialog
+  Future<void> _showLifeWarningDialog() async {
+    pauseTimer();
+    await showDialog(
+      context: context,
+      builder: (context) => const LifeWarningDialog(),
+    ).then((_) => startGameTimer());
+    resumeTimer();
+  }
+
   // Function to check for collisions and consume items
   void _checkCollisionsAndConsumeItems({bool isInfinite = false}) {
     if (_holePosition == null) return;
@@ -456,7 +468,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
     for (final item in _items) {
       if (item.isEaten) continue;
-
       final distance = (item.position - _holePosition!).distance;
       if (distance < _playerHoleRadius) {
         // Changed from size-based to power-based comparison
@@ -469,8 +480,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               _lastHitTime = DateTime.now();
               itemsToRemove.add(item);
               isInvulnerable = true;
+              if (ScoreController.getIsHitFirstTimeBool) {
+                _showLifeWarningDialog();
+              }
+              ScoreController.isHitFirstTime();
             });
-
             // Start timer to disable invulnerability
             Timer(const Duration(milliseconds: invulnerabilityTimeInMs), () {
               if (mounted) {
@@ -627,25 +641,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Game Over!'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Your final score: $_playerScoreView'),
-              Text('Remaining enemies: $remainingEnemies'),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Play Again'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+        return GameOverDialog(
+          playerScoreView: _playerScoreView,
+          remainingEnemies: remainingEnemies,
         );
       },
     );
