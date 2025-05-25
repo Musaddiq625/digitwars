@@ -36,7 +36,7 @@ class ScoreDialog extends StatelessWidget {
       content: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: SizedBox(
-          width: history.isEmpty ? 320 : 610,
+          width: history.isEmpty ? 320 : 620,
           child:
               history.isEmpty
                   ? const Text('No score history yet')
