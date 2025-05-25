@@ -460,8 +460,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   // Function to check for collisions and consume items
-  void _checkCollisionsAndConsumeItems({bool isInfinite = false}) {
-    if (_holePosition == null) return;
+  Future<void> _checkCollisionsAndConsumeItems({
+    bool isInfinite = false,
+  }) async {
+    if (_holePosition == null || isInvulnerable) return;
 
     final itemsToRemove = <GameItem>[];
     final now = DateTime.now();
@@ -475,16 +477,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
           // Compare points instead of size
           // Handle dangerous collision
           if (now.difference(_lastHitTime).inSeconds >= 2) {
-            setState(() {
-              _lives--;
-              _lastHitTime = DateTime.now();
-              itemsToRemove.add(item);
-              isInvulnerable = true;
-              if (ScoreController.getIsHitFirstTimeBool) {
-                _showLifeWarningDialog();
-              }
-              ScoreController.isHitFirstTime();
-            });
+            _lives--;
+            _lastHitTime = DateTime.now();
+            itemsToRemove.add(item);
+            isInvulnerable = true;
+            if (ScoreController.getIsHitFirstTimeBool) {
+              await _showLifeWarningDialog();
+            }
+            ScoreController.isHitFirstTime();
             // Start timer to disable invulnerability
             Timer(const Duration(milliseconds: invulnerabilityTimeInMs), () {
               if (mounted) {
@@ -503,10 +503,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         _playerScore += item.points;
         _playerScoreView += item.points;
         setState(() {});
-        if (isInvulnerable) {
-          isInvulnerable = false;
-          setState(() {});
-        }
 
         // ————————————— New threshold: score, not count —————————————
         final requiredScoreToGrow = getRequiredScoreToGrow(
@@ -538,7 +534,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               });
             }
           });
-          _holeSizeController.forward(from: 0);
+          await _holeSizeController.forward(from: 0);
           dev.log(
             'Leveled UP! New Power: $_playerPower, '
             'Remaining Score: $_playerScore, '
