@@ -71,7 +71,7 @@ class HelpDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          child: const Text('Got it!'),
+          child: const Text('Start'),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ],

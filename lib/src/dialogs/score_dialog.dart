@@ -39,7 +39,7 @@ class ScoreDialog extends StatelessWidget {
           width: history.isEmpty ? 320 : 610,
           child:
               history.isEmpty
-                  ? const Text('No score history yet.')
+                  ? const Text('No score history yet')
                   : DataTable(
                     columns: const [
                       DataColumn(
