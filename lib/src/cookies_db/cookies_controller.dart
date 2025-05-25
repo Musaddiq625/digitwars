@@ -12,7 +12,7 @@ class CookiesController {
     if (document.cookie == null || document.cookie!.isEmpty) {
       return null;
     }
-    
+
     final cookies = document.cookie!.split(';');
     for (var cookie in cookies) {
       cookie = cookie.trim();

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:digitwars_io/src/cookies_db/cookies_constants.dart';
 import 'package:digitwars_io/src/cookies_db/cookies_controller.dart';
 import 'package:digitwars_io/src/models/game_mode.dart';
 
@@ -7,7 +8,9 @@ class ScoreController {
   static final List<Score> _scoreHistory = [];
 
   static void init() {
-    final scoreHistoryJson = CookiesController.getCookie('score_');
+    final scoreHistoryJson = CookiesController.getCookie(
+      CookiesConstants.score,
+    );
     if (scoreHistoryJson != null) {
       final scoreHistoryList = scoreHistoryJson.split('::');
       for (final scoreJson in scoreHistoryList) {
@@ -38,7 +41,7 @@ class ScoreController {
       ),
     );
     CookiesController.setCookie(
-      'score_',
+      CookiesConstants.score,
       _scoreHistory.map((e) => jsonEncode(e.toJson())).join('::'),
     );
   }
@@ -54,6 +57,18 @@ class ScoreController {
         .map((e) => e.score)
         .reduce((value, element) => value > element ? value : element);
   }
+
+  static void isHitFirstTime() {
+    final hitFirstTime = CookiesController.getCookie(
+      CookiesConstants.hitFirstTime,
+    );
+    if (hitFirstTime == null) {
+      CookiesController.setCookie(CookiesConstants.hitFirstTime, 'true');
+    }
+  }
+
+  static bool get getIsHitFirstTimeBool =>
+      CookiesController.getCookie(CookiesConstants.hitFirstTime) == null;
 }
 
 class Score {
