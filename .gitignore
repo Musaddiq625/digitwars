@@ -75,3 +75,6 @@ ios/build/
 macos/
 windows/
 linux/
+
+# FVM Version Cache
+.fvm/
