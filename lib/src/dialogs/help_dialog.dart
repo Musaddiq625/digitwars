@@ -23,7 +23,7 @@ class HelpDialog extends StatelessWidget {
 
             SizedBox(height: 16),
             Text(
-              '⏱ Time Limit:',
+              '⌛ Time Limit:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
