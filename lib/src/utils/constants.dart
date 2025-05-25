@@ -1,4 +1,5 @@
 // Duration of the game in seconds
+import 'package:digitwars_io/src/models/game_mode.dart';
 import 'package:flutter/material.dart';
 
 const int gameDurationSeconds = 120;
@@ -16,7 +17,12 @@ const int totalLives = 3;
 const int invulnerabilityTimeInMs = 1500;
 
 // Item related constants
-final List<int> initialItemsList = [30, 40, 50, 60];
+ final List<GameMode> initialItemsList = [
+  GameMode(name: 'Easy', enemiesCount: 30),
+  GameMode(name: 'Medium', enemiesCount: 50),
+  GameMode(name: 'Hard', enemiesCount: 70),
+  GameMode(name: 'Infinite', enemiesCount: 50),
+];
 List<List<Color>> themes = [
   // Cosmic nebula
   [const Color(0xFF8A2BE2), const Color(0xFFE6C3FF)],

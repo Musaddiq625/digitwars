@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:digitwars_io/src/game/game_area_painter.dart';
-import 'package:digitwars_io/src/game/help_dialog.dart';
+import 'package:digitwars_io/src/dialogs/help_dialog.dart';
 import 'package:digitwars_io/src/mini_map/minimap_painter.dart';
 import 'package:digitwars_io/src/models/game_item.dart';
 import 'package:digitwars_io/src/utils/constants.dart';

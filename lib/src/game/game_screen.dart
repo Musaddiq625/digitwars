@@ -4,22 +4,24 @@ import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:digitwars_io/src/game/game_screen_ui.dart';
-import 'package:digitwars_io/src/game/help_dialog.dart';
-import 'package:digitwars_io/src/game/success_dialog.dart';
+import 'package:digitwars_io/src/dialogs/help_dialog.dart';
+import 'package:digitwars_io/src/dialogs/success_dialog.dart';
 import 'package:digitwars_io/src/models/game_item.dart';
+import 'package:digitwars_io/src/models/game_mode.dart';
 import 'package:digitwars_io/src/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:digitwars_io/src/game/score_controller.dart';
 
 // GameScreen widget where the main game play happens
 class GameScreen extends StatefulWidget {
   final int selectedTheme;
-  final int enemiesInput;
   final bool isInfiniteGame;
+  final GameMode gameMode;
 
   const GameScreen({
     required this.selectedTheme,
-    required this.enemiesInput,
     required this.isInfiniteGame,
+    required this.gameMode,
     super.key,
   });
 
@@ -94,7 +96,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   // Add animation controller for progress indicator
   late AnimationController _progressAnimationController;
   late Animation<double> _progressAnimation;
-  late final int _enemiesInput = widget.enemiesInput;
+  late final int _enemiesInput = widget.gameMode.enemiesCount;
 
   @override
   void initState() {
@@ -585,6 +587,15 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   void endGameWithVictory() {
+    // Save score as a win
+    ScoreController.addScore(
+      _playerScoreView,
+      time: DateTime.now(),
+      endType: EndType.win,
+      elapsedTime: gameDurationSeconds - _remainingTime,
+      remainingTime: _remainingTime,
+      gameMode: widget.gameMode,
+    );
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -600,10 +611,18 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     );
   }
 
-  // Function to handle game end logic
   void endGame() {
     pauseTimer();
-    // Count remaining uneaten items
+    // Save score as a loss or time ended
+    final endType = _remainingTime <= 0 ? EndType.timeEnded : EndType.lose;
+    ScoreController.addScore(
+      _playerScoreView,
+      time: DateTime.now(),
+      endType: endType,
+      elapsedTime: gameDurationSeconds - _remainingTime,
+      remainingTime: _remainingTime,
+      gameMode: widget.gameMode,
+    );
     showDialog(
       context: context,
       barrierDismissible: false,
