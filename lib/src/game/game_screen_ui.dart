@@ -6,6 +6,7 @@ import 'package:digitwars_io/src/mini_map/minimap_painter.dart';
 import 'package:digitwars_io/src/models/game_item.dart';
 import 'package:digitwars_io/src/utils/constants.dart';
 import 'package:digitwars_io/src/utils/shader_util.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class GameScreenUI extends StatefulWidget {
@@ -94,6 +95,24 @@ class _GameScreenUIState extends State<GameScreenUI>
     super.dispose();
   }
 
+  Widget livesWidget() {
+    return Row(
+      children:
+          List.generate(
+            3,
+            (index) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Icon(
+                widget.lives < index + 1
+                    ? Icons.favorite_border
+                    : Icons.favorite,
+                color: Colors.red,
+              ),
+            ),
+          ).reversed.toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Use parentContext for MediaQuery and Theme to ensure they are from _GameScreenState's context
@@ -101,7 +120,7 @@ class _GameScreenUIState extends State<GameScreenUI>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Void Core Game'),
+        title: !kIsWeb ? null : const Text('Void Core Game'),
         centerTitle: false,
         backgroundColor: themes[_selectedTheme][0],
         actions: [
@@ -121,21 +140,7 @@ class _GameScreenUIState extends State<GameScreenUI>
             child: Row(
               spacing: 16,
               children: [
-                Row(
-                  children:
-                      List.generate(
-                        3,
-                        (index) => Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: Icon(
-                            widget.lives < index + 1
-                                ? Icons.favorite_border
-                                : Icons.favorite,
-                            color: Colors.red,
-                          ),
-                        ),
-                      ).reversed.toList(),
-                ),
+                if (kIsWeb) livesWidget(),
                 Text(
                   'Time: ${widget.getFormattedTime()}',
                   style: const TextStyle(
@@ -183,6 +188,7 @@ class _GameScreenUIState extends State<GameScreenUI>
                             shader: shader,
                             timeValue: _shaderController.value,
                             isInvulnerable: widget.isInvulnerable,
+                            context: context,
                           ),
                         );
                       },
@@ -239,6 +245,12 @@ class _GameScreenUIState extends State<GameScreenUI>
           //       ],
           //     ),
           //   ),
+          if (!kIsWeb)
+            Positioned(
+              top: widget.minimapPadding,
+              left: 10,
+              child: livesWidget(),
+            ),
           // Keep existing UI elements like minimap and text
           if (widget.holePosition != null && widget.gameWorldSize != Size.zero)
             Positioned(
