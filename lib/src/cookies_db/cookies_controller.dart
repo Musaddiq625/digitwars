@@ -1,26 +1,22 @@
-import 'dart:html';
+import 'package:digitwars_io/src/cookies_db/cookies_web.dart'
+    if (dart.library.io) 'package:digitwars_io/src/cookies_db/shared_pref_mobile.dart'
+    as cookie_handler;
 
-class CookiesController {
-  static void setCookie(String key, String value, {int days = 7}) {
-    final expires = DateTime.now().add(Duration(days: days));
-    // Format the date according to cookie date format specification
-    final formattedDate = expires.toUtc().toString().replaceAll(' ', 'T');
-    document.cookie = '$key=$value; expires=$formattedDate; path=/';
+abstract class CookiesController {
+  Future<void> setValue(String key, String value, {int days = 7});
+  Future<String?> getValue(String key);
+}
+
+class PlatformCookies implements CookiesController {
+  String? _value;
+  @override
+  Future<void> setValue(String key, String value, {int days = 7}) async {
+    _value = value;
+    await cookie_handler.setValue(key, value, days: days);
   }
 
-  static String? getCookie(String key) {
-    if (document.cookie == null || document.cookie!.isEmpty) {
-      return null;
-    }
-
-    final cookies = document.cookie!.split(';');
-    for (var cookie in cookies) {
-      cookie = cookie.trim();
-      final parts = cookie.split('=');
-      if (parts.length == 2 && parts[0] == key) {
-        return Uri.decodeComponent(parts[1]);
-      }
-    }
-    return null;
+  @override
+  Future<String?> getValue(String key) async {
+    return _value ?? await cookie_handler.getValue(key);
   }
 }

@@ -65,10 +65,20 @@ class _CloudyCircleState extends State<CloudyCircle>
         final scaledWidth = width * devicePixelRatio;
         final scaledHeight = height * devicePixelRatio;
 
+         // Convert Flutter Colors to normalized floats (0-1)
+        final r1 = widget.color1.red / 255.0;
+        final g1 = widget.color1.green / 255.0;
+        final b1 = widget.color1.blue / 255.0;
+
+        final r2 = widget.color2.red / 255.0;
+        final g2 = widget.color2.green / 255.0;
+        final b2 = widget.color2.blue / 255.0;
+
+
         shader!
           ..setFloat(0, time)
           ..setFloat(1, scaledWidth) // Scaled resolution X
-          ..setFloat(2, scaledHeight); // Scaled resolution Y
+          ..setFloat(2, scaledHeight) // Scaled resolution Y
           // uColor1 (vec3)
           ..setFloat(3, r1)
           ..setFloat(4, g1)
