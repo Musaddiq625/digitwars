@@ -6,12 +6,10 @@ import 'package:digitwars_io/src/models/game_mode.dart';
 
 class ScoreController {
   static final List<Score> _scoreHistory = [];
-  static final localDB =  PlatformCookies();
+  static final localDB = PlatformCookies();
 
   static void init() async {
-    final scoreHistoryJson = await localDB.getValue(
-      CookiesConstants.score,
-    );
+    final scoreHistoryJson = await localDB.getValue(CookiesConstants.score);
     if (scoreHistoryJson != null) {
       final scoreHistoryList = scoreHistoryJson.split('::');
       for (final scoreJson in scoreHistoryList) {
@@ -31,7 +29,8 @@ class ScoreController {
     required int remainingTime,
     required GameMode gameMode,
   }) async {
-    _scoreHistory.add(
+    _scoreHistory.insert(
+      0,
       Score(
         score: score,
         time: time,
@@ -53,28 +52,26 @@ class ScoreController {
     if (_scoreHistory.isEmpty) {
       return null;
     }
-    
+
     // Sort scores by score value (descending) and elapsed time (ascending)
-    final sortedScores = List<Score>.from(_scoreHistory)
-      ..sort((a, b) {
-        // First compare scores
-        final scoreCompare = b.score.compareTo(a.score);
-        if (scoreCompare != 0) return scoreCompare;
-        
-        // If scores are equal, compare elapsed time
-        // Note: Null elapsed times are considered last
-        if (a.elapsedTime == null) return 1;
-        if (b.elapsedTime == null) return -1;
-        return a.elapsedTime!.compareTo(b.elapsedTime!);
-      });
+    final sortedScores = List<Score>.from(_scoreHistory)..sort((a, b) {
+      // First compare scores
+      final scoreCompare = b.score.compareTo(a.score);
+      if (scoreCompare != 0) return scoreCompare;
+
+      // If scores are equal, compare elapsed time
+      // Note: Null elapsed times are considered last
+      if (a.elapsedTime == null) return 1;
+      if (b.elapsedTime == null) return -1;
+      return a.elapsedTime!.compareTo(b.elapsedTime!);
+    });
 
     // Return the highest score (which will be the first score after sorting)
     return sortedScores.first.score;
   }
+
   static Future<void> isHitFirstTime() async {
-    final hitFirstTime = await localDB.getValue(
-      CookiesConstants.hitFirstTime,
-    );
+    final hitFirstTime = await localDB.getValue(CookiesConstants.hitFirstTime);
     if (hitFirstTime == null) {
       await localDB.setValue(CookiesConstants.hitFirstTime, 'true');
     }
