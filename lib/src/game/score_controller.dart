@@ -6,9 +6,10 @@ import 'package:digitwars_io/src/models/game_mode.dart';
 
 class ScoreController {
   static final List<Score> _scoreHistory = [];
+  static final localDB =  PlatformCookies();
 
-  static void init() {
-    final scoreHistoryJson = CookiesController.getCookie(
+  static void init() async {
+    final scoreHistoryJson = await localDB.getValue(
       CookiesConstants.score,
     );
     if (scoreHistoryJson != null) {
@@ -22,14 +23,14 @@ class ScoreController {
   }
 
   // Add score at a specific time
-  static void addScore(
+  static Future<void> addScore(
     int score, {
     required DateTime time,
     required EndType endType,
     required int elapsedTime,
     required int remainingTime,
     required GameMode gameMode,
-  }) {
+  }) async {
     _scoreHistory.add(
       Score(
         score: score,
@@ -40,7 +41,7 @@ class ScoreController {
         gameMode: gameMode,
       ),
     );
-    CookiesController.setCookie(
+    await localDB.setValue(
       CookiesConstants.score,
       _scoreHistory.map((e) => jsonEncode(e.toJson())).join('::'),
     );
@@ -70,17 +71,17 @@ class ScoreController {
     // Return the highest score (which will be the first score after sorting)
     return sortedScores.first.score;
   }
-  static void isHitFirstTime() {
-    final hitFirstTime = CookiesController.getCookie(
+  static Future<void> isHitFirstTime() async {
+    final hitFirstTime = await localDB.getValue(
       CookiesConstants.hitFirstTime,
     );
     if (hitFirstTime == null) {
-      CookiesController.setCookie(CookiesConstants.hitFirstTime, 'true');
+      await localDB.setValue(CookiesConstants.hitFirstTime, 'true');
     }
   }
 
-  static bool get getIsHitFirstTimeBool =>
-      CookiesController.getCookie(CookiesConstants.hitFirstTime) == null;
+  static Future<bool> get getIsHitFirstTimeBool async =>
+      await localDB.getValue(CookiesConstants.hitFirstTime) == null;
 }
 
 class Score {

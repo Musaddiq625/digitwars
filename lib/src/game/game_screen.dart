@@ -481,10 +481,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             _lastHitTime = DateTime.now();
             itemsToRemove.add(item);
             isInvulnerable = true;
-            if (ScoreController.getIsHitFirstTimeBool) {
+            if (await ScoreController.getIsHitFirstTimeBool) {
               await _showLifeWarningDialog();
             }
-            ScoreController.isHitFirstTime();
+            await ScoreController.isHitFirstTime();
             // Start timer to disable invulnerability
             Timer(const Duration(milliseconds: invulnerabilityTimeInMs), () {
               if (mounted) {
