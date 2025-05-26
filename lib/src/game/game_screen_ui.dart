@@ -120,7 +120,7 @@ class _GameScreenUIState extends State<GameScreenUI>
 
     return Scaffold(
       appBar: AppBar(
-        title: !kIsWeb ? null : const Text('Void Core Game'),
+        title: !kIsWeb ? null : const Text('Digit Wars Game'),
         centerTitle: false,
         backgroundColor: themes[_selectedTheme][0],
         actions: [
