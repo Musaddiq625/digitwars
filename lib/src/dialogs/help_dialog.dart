@@ -7,7 +7,7 @@ class HelpDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('How to Play Void Core'),
+      title: const Text('How to Play Digit Wars'),
       content: const SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -18,7 +18,7 @@ class HelpDialog extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              'Grow your Void Core by consuming smaller energy nodes while avoiding larger ones!',
+              'Grow your Digit Wars by consuming smaller energy nodes while avoiding larger ones!',
             ),
 
             SizedBox(height: 16),
@@ -36,7 +36,7 @@ class HelpDialog extends StatelessWidget {
             Text('🕹 Controls:', style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
             Text(
-              '• Click, hold and drag to move your Void Core\n'
+              '• Click, hold and drag to move your Core\n'
               '• Release to stop movement\n'
               '• Camera follows your movement automatically',
             ),

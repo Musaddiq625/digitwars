@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Void Core Game',
+      title: 'Digit Wars Game',
       theme: ThemeData(
         iconTheme: const IconThemeData(color: Colors.white),
         primaryColor: Colors.white,
