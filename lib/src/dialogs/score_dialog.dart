@@ -74,84 +74,90 @@ class ScoreDialog extends StatelessWidget {
     }
 
     Widget webTableView() {
-      return SizedBox(
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: SingleChildScrollView(
-          child: DataTable(
-            columns: const [
-              DataColumn(
-                label: Center(
-                  child: Text('Score', textAlign: TextAlign.center),
+      return ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.width * 0.6,
+        ),
+        child: IntrinsicHeight(
+          child: SingleChildScrollView(
+            child: DataTable(
+              columns: const [
+                DataColumn(
+                  label: Center(
+                    child: Text('Score', textAlign: TextAlign.center),
+                  ),
                 ),
-              ),
-              DataColumn(
-                label: Center(
-                  child: Text('End Type', textAlign: TextAlign.center),
+                DataColumn(
+                  label: Center(
+                    child: Text('End Type', textAlign: TextAlign.center),
+                  ),
                 ),
-              ),
-              DataColumn(
-                label: Text('Elapsed (s)', textAlign: TextAlign.center),
-              ),
-              DataColumn(
-                label: Text('Remaining (s)', textAlign: TextAlign.center),
-              ),
-              DataColumn(label: Text('Game Mode', textAlign: TextAlign.center)),
-            ],
-            rows:
-                history
-                    .map(
-                      (score) => DataRow(
-                        cells: [
-                          DataCell(Center(child: Text('${score.score}'))),
-                          DataCell(
-                            Center(
-                              child:
+                DataColumn(
+                  label: Text('Elapsed (s)', textAlign: TextAlign.center),
+                ),
+                DataColumn(
+                  label: Text('Remaining (s)', textAlign: TextAlign.center),
+                ),
+                DataColumn(
+                  label: Text('Game Mode', textAlign: TextAlign.center),
+                ),
+              ],
+              rows:
+                  history
+                      .map(
+                        (score) => DataRow(
+                          cells: [
+                            DataCell(Center(child: Text('${score.score}'))),
+                            DataCell(
+                              Center(
+                                child:
+                                    score.gameMode.name ==
+                                            initialItemsList.last.name
+                                        ? const Text('-')
+                                        : Text(
+                                          _formatEndType(score.endType),
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color:
+                                                score.endType == EndType.win
+                                                    ? Colors.green
+                                                    : Colors.red,
+                                          ),
+                                        ),
+                              ),
+                            ),
+                            DataCell(
+                              Center(
+                                child: Text(
+                                  '${score.elapsedTime ?? "-"}',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Center(
+                                child: Text(
                                   score.gameMode.name ==
                                           initialItemsList.last.name
-                                      ? const Text('-')
-                                      : Text(
-                                        _formatEndType(score.endType),
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color:
-                                              score.endType == EndType.win
-                                                  ? Colors.green
-                                                  : Colors.red,
-                                        ),
-                                      ),
-                            ),
-                          ),
-                          DataCell(
-                            Center(
-                              child: Text(
-                                '${score.elapsedTime ?? "-"}',
-                                textAlign: TextAlign.center,
+                                      ? '-'
+                                      : '${score.remainingTime ?? "-"}',
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
-                          ),
-                          DataCell(
-                            Center(
-                              child: Text(
-                                score.gameMode.name ==
-                                        initialItemsList.last.name
-                                    ? '-'
-                                    : '${score.remainingTime ?? "-"}',
-                                textAlign: TextAlign.center,
+                            DataCell(
+                              Center(
+                                child: Text(
+                                  score.gameMode.name,
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
-                          ),
-                          DataCell(
-                            Center(
-                              child: Text(
-                                score.gameMode.name,
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                    .toList(),
+                          ],
+                        ),
+                      )
+                      .toList(),
+            ),
           ),
         ),
       );
@@ -165,7 +171,7 @@ class ScoreDialog extends StatelessWidget {
           if (getHighestScore != null)
             // trophy emoji with score
             Text(
-              '🏆 Highest score: $getHighestScore',
+              '🏆 Highest Score: $getHighestScore',
               style: const TextStyle(fontSize: 12),
             ),
         ],
