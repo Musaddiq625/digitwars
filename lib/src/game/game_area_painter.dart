@@ -5,6 +5,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:digitwars_io/src/models/game_item.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class GameAreaPainter extends CustomPainter {
@@ -21,6 +22,7 @@ class GameAreaPainter extends CustomPainter {
   final Offset? movementDelta;
   final List<Color> backgroundColor;
   final bool isInvulnerable;
+  final BuildContext context;
 
   GameAreaPainter({
     required this.holePosition,
@@ -33,18 +35,23 @@ class GameAreaPainter extends CustomPainter {
     required this.backgroundColor,
     required this.shader,
     required this.timeValue,
+    required this.context,
     this.movementDelta,
     this.isInvulnerable = false,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
+    final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+    final scaledWidth = size.width * devicePixelRatio / (kIsWeb ? 2 : 1);
+    final scaledHeight = size.height * devicePixelRatio / 2;
+
     if (shader != null) {
       // Set shader parameters
       shader!
         ..setFloat(0, timeValue * 200)
-        ..setFloat(1, size.width / 1.8)
-        ..setFloat(2, size.height / 1.8)
+        ..setFloat(1, scaledWidth)
+        ..setFloat(2, scaledHeight)
         ..setFloat(3, backgroundColor[0].red / 255.0)
         ..setFloat(4, backgroundColor[0].green / 255.0)
         ..setFloat(5, backgroundColor[0].blue / 255.0)
@@ -82,6 +89,13 @@ class GameAreaPainter extends CustomPainter {
           itemScreenPos.dy - item.size > size.height) {
         continue; // Skip drawing items outside the canvas
       }
+      final borderPaint =
+          Paint()
+            ..color = Colors.black
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2.0;
+      canvas.drawCircle(itemScreenPos, item.size, borderPaint);
+
       final itemPaint = Paint()..color = item.color;
       canvas.drawCircle(itemScreenPos, item.size, itemPaint);
 
