@@ -170,7 +170,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
       _spawnItems(_enemiesInput);
     });
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     await showDialog(
       context: context,
@@ -597,11 +597,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   void endGameWithVictory() {
-    // Save score as a win
+    // Save score as a victory
     ScoreController.addScore(
       _playerScoreView,
       time: DateTime.now(),
-      endType: EndType.win,
+      endType: EndType.victory,
       elapsedTime: gameDurationSeconds - _remainingTime,
       remainingTime: _remainingTime,
       gameMode: widget.gameMode,
@@ -624,7 +624,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   void endGame() {
     pauseTimer();
     // Save score as a loss or time ended
-    final endType = _remainingTime <= 0 ? EndType.timeEnded : EndType.lose;
+    final endType = _remainingTime <= 0 ? EndType.timeEnded : EndType.defeat;
     ScoreController.addScore(
       _playerScoreView,
       time: DateTime.now(),

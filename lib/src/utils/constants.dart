@@ -17,7 +17,7 @@ const int totalLives = 3;
 const int invulnerabilityTimeInMs = 1500;
 
 // Item related constants
- final List<GameMode> initialItemsList = [
+final List<GameMode> initialItemsList = [
   GameMode(name: 'Easy', enemiesCount: 30),
   GameMode(name: 'Medium', enemiesCount: 50),
   GameMode(name: 'Hard', enemiesCount: 70),

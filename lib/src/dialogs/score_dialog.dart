@@ -1,5 +1,6 @@
 import 'package:digitwars_io/src/game/score_controller.dart';
 import 'package:digitwars_io/src/utils/constants.dart';
+import 'package:digitwars_io/src/utils/numbers_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -8,10 +9,10 @@ class ScoreDialog extends StatelessWidget {
 
   String _formatEndType(EndType type) {
     switch (type) {
-      case EndType.win:
-        return 'Win';
-      case EndType.lose:
-        return 'Lose';
+      case EndType.victory:
+        return 'Victory';
+      case EndType.defeat:
+        return 'Defeat';
       case EndType.timeEnded:
         return 'Time Ended';
     }
@@ -24,7 +25,6 @@ class ScoreDialog extends StatelessWidget {
 
     Widget mobileView() {
       return SizedBox(
-        width: MediaQuery.of(context).size.width * 0.9,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -34,13 +34,14 @@ class ScoreDialog extends StatelessWidget {
                       (score) => ExpansionTile(
                         title: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Text('Score: ${score.score}'),
                             Text(
                               _formatEndType(score.endType),
                               style: TextStyle(
                                 color:
-                                    score.endType == EndType.win
+                                    score.endType == EndType.victory
                                         ? Colors.green
                                         : Colors.red,
                               ),
@@ -51,15 +52,17 @@ class ScoreDialog extends StatelessWidget {
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
+                              horizontal: 016,
                             ).copyWith(bottom: 10),
-                            width: MediaQuery.of(context).size.width * 0.8,
+                            width: MediaQuery.of(context).size.width * 0.7,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Elapsed: ${score.elapsedTime ?? '-'}"),
                                 Text(
-                                  "Remaining: ${score.remainingTime ?? '-'}",
+                                  'Elapsed (s): ${NumbersUtil.formatSeconds(score.elapsedTime)}',
+                                ),
+                                Text(
+                                  'Remaining (s): ${NumbersUtil.formatSeconds(score.remainingTime)}',
                                 ),
                               ],
                             ),
@@ -119,7 +122,7 @@ class ScoreDialog extends StatelessWidget {
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             color:
-                                                score.endType == EndType.win
+                                                score.endType == EndType.victory
                                                     ? Colors.green
                                                     : Colors.red,
                                           ),
@@ -129,7 +132,7 @@ class ScoreDialog extends StatelessWidget {
                             DataCell(
                               Center(
                                 child: Text(
-                                  '${score.elapsedTime ?? "-"}',
+                                  NumbersUtil.formatSeconds(score.elapsedTime),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
@@ -140,7 +143,7 @@ class ScoreDialog extends StatelessWidget {
                                   score.gameMode.name ==
                                           initialItemsList.last.name
                                       ? '-'
-                                      : '${score.remainingTime ?? "-"}',
+                                      : '${NumbersUtil.formatSeconds(score.remainingTime)}',
                                   textAlign: TextAlign.center,
                                 ),
                               ),
@@ -179,7 +182,12 @@ class ScoreDialog extends StatelessWidget {
       content: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: SizedBox(
-          width: history.isEmpty ? 320 : 630,
+          width:
+              history.isEmpty
+                  ? 320
+                  : kIsWeb
+                  ? 640
+                  : MediaQuery.of(context).size.width * 0.6,
           child:
               history.isEmpty
                   ? const Text('No score history yet')

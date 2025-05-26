@@ -72,7 +72,7 @@ class _StartScreenState extends State<StartScreen> {
                     children: [
                       const SizedBox(height: 20),
                       Text(
-                        'Void Core',
+                        'Digit Wars',
                         style: Theme.of(context).textTheme.headlineLarge,
                       ),
                       const SizedBox(height: 32),

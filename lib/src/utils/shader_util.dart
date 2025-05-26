@@ -2,7 +2,7 @@ import 'dart:ui';
 
 class ShaderUtil {
   static FragmentShader? _cloudyShader;
-  
+
   // Getter that initializes shader if needed
   static Future<FragmentShader> get shader async {
     return _cloudyShader ??= await _loadShader();

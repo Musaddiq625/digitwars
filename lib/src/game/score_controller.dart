@@ -122,4 +122,4 @@ class Score {
   }
 }
 
-enum EndType { timeEnded, win, lose }
+enum EndType { timeEnded, victory, defeat }

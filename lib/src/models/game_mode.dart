@@ -12,9 +12,6 @@ class GameMode {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'enemiesCount': enemiesCount,
-    };
+    return {'name': name, 'enemiesCount': enemiesCount};
   }
 }
