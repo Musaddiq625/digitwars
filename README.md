@@ -8,9 +8,10 @@ Inspired by [<b><u>Agar.io</u></b>](https://agar.io), this game is a strategic n
 - 4 Challenging Modes: Easy (30 enemies), Medium (40), Hard (50), Extreme (Endless)
 - Dynamic power progression system
 - Lives system with invincibility frames
+- Local highscore history
 - Real-time minimap for tactical awareness
 - Hypnotic visual effects with custom shaders
-- Visually Stunning Themes:
+- Visually Stunning Themes:<br>
     • 🌌 Cosmic Nebula
     • 🌊 Deep Ocean
     • 🌅 Sunset Paradise
@@ -28,6 +29,12 @@ Inspired by [<b><u>Agar.io</u></b>](https://agar.io), this game is a strategic n
 Click Play → Choose Mode → Start!
 
 ## 🔧 Technical Highlights
-Built with Flutter • Custom physics engine • Platform-adaptive storage • Responsive UI • No third-party libraries/packages
+Built with Flutter • No third-party libraries/packages
+
+## 🎮 Gameplay
+
+https://github.com/user-attachments/assets/b62abf5c-f1f3-48ff-85da-0182d2cd9c83
+
+
 
 Made with ❤️ by Musaddiq625
