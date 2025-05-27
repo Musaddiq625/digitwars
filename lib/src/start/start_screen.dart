@@ -18,6 +18,32 @@ class _StartScreenState extends State<StartScreen> {
   GameMode selectedGameMode = initialItemsList[0];
   bool isInfiniteSelected = false;
   final GlobalKey _globalKey = GlobalKey(); // Key for RepaintBoundary
+  bool overlayAdded = false;
+
+  void _insertOverlay(BuildContext context) {
+    if (overlayAdded) return;
+    setState(() => overlayAdded = true);
+    return Overlay.of(context).insert(
+      OverlayEntry(
+        builder: (context) {
+          return Positioned(
+            bottom: 16,
+            left: 16,
+            child: Material(
+              color: Colors.transparent,
+              child: Text(
+                'Made with ❤️ by Musaddiq625',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.7),
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -38,6 +64,9 @@ class _StartScreenState extends State<StartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _insertOverlay(context),
+    );
     return RepaintBoundary(
       // Wrap the part of the UI you want to capture
       key: _globalKey,
