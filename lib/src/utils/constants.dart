@@ -21,7 +21,7 @@ final List<GameMode> initialItemsList = [
   GameMode(name: 'Easy', enemiesCount: 30),
   GameMode(name: 'Medium', enemiesCount: 50),
   GameMode(name: 'Hard', enemiesCount: 70),
-  GameMode(name: 'Infinite', enemiesCount: 50),
+  GameMode(name: 'Extreme', enemiesCount: 50),
 ];
 List<List<Color>> themes = [
   // Cosmic nebula

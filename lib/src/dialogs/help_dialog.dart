@@ -18,7 +18,7 @@ class HelpDialog extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              'Grow your Digit Wars by consuming smaller energy nodes while avoiding larger ones!',
+              'Grow your Core by consuming smaller energy nodes while avoiding larger ones!',
             ),
 
             SizedBox(height: 16),
@@ -49,7 +49,7 @@ class HelpDialog extends StatelessWidget {
             SizedBox(height: 8),
             Text(
               '• Consume items smaller than your current power level\n'
-              '• Earn points to grow bigger and access new items',
+              '• Collect points to level up and become stronger!',
             ),
 
             SizedBox(height: 16),

@@ -7,13 +7,13 @@ import 'package:digitwars_io/src/models/game_mode.dart';
 class ScoreController {
   static final List<Score> _scoreHistory = [];
   static final localDB = PlatformCookies();
+  static const splitter = '::';
 
-  static void init() async {
+  static Future<void> init() async {
     final scoreHistoryJson = await localDB.getValue(CookiesConstants.score);
     if (scoreHistoryJson != null) {
-      final scoreHistoryList = scoreHistoryJson.split('::');
+      final scoreHistoryList = scoreHistoryJson.split(splitter);
       for (final scoreJson in scoreHistoryList) {
-        print('scoreJson $scoreJson');
         final score = Score.fromJson(jsonDecode(scoreJson));
         _scoreHistory.add(score);
       }
@@ -42,7 +42,7 @@ class ScoreController {
     );
     await localDB.setValue(
       CookiesConstants.score,
-      _scoreHistory.map((e) => jsonEncode(e.toJson())).join('::'),
+      _scoreHistory.map((e) => jsonEncode(e.toJson())).join(splitter),
     );
   }
 
@@ -71,10 +71,7 @@ class ScoreController {
   }
 
   static Future<void> isHitFirstTime() async {
-    final hitFirstTime = await localDB.getValue(CookiesConstants.hitFirstTime);
-    if (hitFirstTime == null) {
-      await localDB.setValue(CookiesConstants.hitFirstTime, 'true');
-    }
+    await localDB.setValue(CookiesConstants.hitFirstTime, 'true');
   }
 
   static Future<bool> get getIsHitFirstTimeBool async =>

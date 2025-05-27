@@ -4,15 +4,16 @@ import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:digitwars_io/src/dialogs/game_over_dialog.dart';
-import 'package:digitwars_io/src/dialogs/life_warning_dialog.dart';
-import 'package:digitwars_io/src/game/game_screen_ui.dart';
 import 'package:digitwars_io/src/dialogs/help_dialog.dart';
+import 'package:digitwars_io/src/dialogs/infinity_enemies_dialog_warning.dart';
+import 'package:digitwars_io/src/dialogs/life_warning_dialog.dart';
 import 'package:digitwars_io/src/dialogs/success_dialog.dart';
+import 'package:digitwars_io/src/game/game_screen_ui.dart';
+import 'package:digitwars_io/src/game/score_controller.dart';
 import 'package:digitwars_io/src/models/game_item.dart';
 import 'package:digitwars_io/src/models/game_mode.dart';
 import 'package:digitwars_io/src/utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:digitwars_io/src/game/score_controller.dart';
 
 // GameScreen widget where the main game play happens
 class GameScreen extends StatefulWidget {
@@ -99,6 +100,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   late AnimationController _progressAnimationController;
   late Animation<double> _progressAnimation;
   late final int _enemiesInput = widget.gameMode.enemiesCount;
+  bool? isFirstTimeHit;
 
   @override
   void initState() {
@@ -114,6 +116,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         curve: Curves.easeInOut,
       ),
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      isFirstTimeHit = await ScoreController.getIsHitFirstTimeBool;
+    });
   }
 
   Future<void> _startGame() async {
@@ -172,6 +177,13 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     });
     await Future.delayed(const Duration(milliseconds: 500));
 
+    if (widget.isInfiniteGame) {
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const InfinityEnemiesDialogWarning(),
+      );
+    }
     await showDialog(
       context: context,
       builder: (context) => const HelpDialog(),
@@ -264,7 +276,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     final progressionFactor = currentTier * 0.15; // 15% increase per tier
 
     // Calculate dynamic weights with progression scaling
-    int totalWeight = 0;
+    var totalWeight = 0;
     final levelWeights = List.generate(numPowerLevels, (powerOffset) {
       final baseWeight =
           (numPowerLevels - powerOffset) *
@@ -378,10 +390,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     final worldHeight = _gameWorldSize.height;
 
     // Base new enemies on player's current level +1, with minimum level 3
-    int baseLevel = _playerPower + 1;
+    var baseLevel = _playerPower + 1;
     if (baseLevel < 3) baseLevel = 3; // Ensure minimum level 3
 
-    for (int i = 0; i < enemiesPerLevel; i++) {
+    for (var i = 0; i < enemiesPerLevel; i++) {
       final itemPoints = baseLevel + i; // Generate sequential levels
       final powerOffset = itemPoints - smallestItemPoints;
       final sizeFactor = powerOffset / _maxItemPowerOffset;
@@ -392,7 +404,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       var validPosition = false;
       var attempts = 0;
       const maxAttempts = 20;
-      double x, y;
+      double x;
+      double y;
 
       do {
         final edgeBufferX = worldWidth * 0.05;
@@ -413,7 +426,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         final newItemRadius = calculatedItemSize;
 
         // Check collisions with existing items
-        for (final existingItem in [..._items, ...newItems]) {
+        // Create COMPLETE snapshot before checking
+        final checkItems = [...List<GameItem>.from(_items), ...newItems];
+
+        for (final existingItem in checkItems) {
           final distance = (existingItem.position - Offset(x, y)).distance;
           if (distance < (existingItem.size + newItemRadius + 10)) {
             validPosition = false;
@@ -451,6 +467,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   // Show life warning dialog
   Future<void> _showLifeWarningDialog() async {
+    isFirstTimeHit = true;
+    setState(() {});
     pauseTimer();
     await showDialog(
       context: context,
@@ -463,12 +481,15 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   Future<void> _checkCollisionsAndConsumeItems({
     bool isInfinite = false,
   }) async {
-    if (_holePosition == null || isInvulnerable) return;
+    if (_holePosition == null) return;
 
     final itemsToRemove = <GameItem>[];
     final now = DateTime.now();
 
-    for (final item in _items) {
+    // Create a snapshot of items to prevent concurrent modification
+    final itemsSnapshot = List<GameItem>.from(_items);
+
+    for (final item in itemsSnapshot) {
       if (item.isEaten) continue;
       final distance = (item.position - _holePosition!).distance;
       if (distance < _playerHoleRadius) {
@@ -481,13 +502,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             _lastHitTime = DateTime.now();
             itemsToRemove.add(item);
             isInvulnerable = true;
-            if (await ScoreController.getIsHitFirstTimeBool) {
+            setState(() {});
+            if (isFirstTimeHit == null) {
               await _showLifeWarningDialog();
+              await ScoreController.isHitFirstTime();
             }
-            await ScoreController.isHitFirstTime();
-            // Start timer to disable invulnerability
+
+            // This timer is not stored in a variable and will be automatically
+            // garbage collected once completed, so no explicit cancellation needed
             Timer(const Duration(milliseconds: invulnerabilityTimeInMs), () {
-              if (mounted) {
+              if (mounted && isInvulnerable) {
                 setState(() => isInvulnerable = false);
               }
             });
@@ -515,9 +539,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
           _playerScore -= requiredScoreToGrow;
           _playerPower++;
 
-          // Add new enemies when leveling up
-          if (isInfinite) _spawnHigherLevelEnemies();
-
           final targetSize = getHoleSizeForLevel(_playerPower);
           _holeSizeAnimation = Tween<double>(
             begin: _playerHoleSize,
@@ -529,12 +550,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             ),
           )..addListener(() {
             if (mounted) {
-              setState(() {
-                _playerHoleSize = _holeSizeAnimation.value;
-              });
+              if (_playerHoleSize != _holeSizeAnimation.value) {
+                setState(() {
+                  _playerHoleSize = _holeSizeAnimation.value;
+                });
+              }
             }
           });
           await _holeSizeController.forward(from: 0);
+          // Add new enemies when leveling up
+          if (isInfinite) _spawnHigherLevelEnemies();
           dev.log(
             'Leveled UP! New Power: $_playerPower, '
             'Remaining Score: $_playerScore, '
@@ -784,7 +809,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 // Add this function to _GameScreenState
 double getHoleSizeForLevel(int level) {
   // You can tweak these constants as needed
-  const double baseSize = 32.0; // Minimum hole size (diameter)
-  const double sizeIncrement = 10.0; // How much size increases per level
+  const baseSize = 32.0; // Minimum hole size (diameter)
+  const sizeIncrement = 10.0; // How much size increases per level
   return baseSize + (level - 1) * sizeIncrement;
 }

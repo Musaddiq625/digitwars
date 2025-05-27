@@ -140,10 +140,9 @@ class ScoreDialog extends StatelessWidget {
                             DataCell(
                               Center(
                                 child: Text(
-                                  score.gameMode.name ==
-                                          initialItemsList.last.name
-                                      ? '-'
-                                      : '${NumbersUtil.formatSeconds(score.remainingTime)}',
+                                  NumbersUtil.formatSeconds(
+                                    score.remainingTime,
+                                  ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),

@@ -1,7 +1,3 @@
-import 'dart:async'; // Import for Timer
-import 'dart:convert'; // Import for base64Encode
-import 'dart:typed_data'; // Import for Uint8List
-import 'dart:ui' as ui; // Import for ui.Image
 import 'package:digitwars_io/src/cloudy_shader.dart';
 import 'package:digitwars_io/src/dialogs/score_dialog.dart';
 import 'package:digitwars_io/src/game/game_screen.dart';
@@ -9,7 +5,6 @@ import 'package:digitwars_io/src/game/score_controller.dart';
 import 'package:digitwars_io/src/models/game_mode.dart';
 import 'package:digitwars_io/src/utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart'; // Import for RenderRepaintBoundary
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -76,7 +71,7 @@ class _StartScreenState extends State<StartScreen> {
                         style: Theme.of(context).textTheme.headlineLarge,
                       ),
                       const SizedBox(height: 32),
-                      const Text('Select the number of enemies:'),
+                      const Text('Select game difficulty:'),
                       const SizedBox(height: 24),
                       Row(
                         children: [
@@ -116,7 +111,7 @@ class _StartScreenState extends State<StartScreen> {
                       ),
                       const SizedBox(height: 32),
                       ChoiceChip(
-                        label: const Text('INFINITE MODE'),
+                        label: const Text(' EXTREME '),
                         selected: isInfiniteSelected,
                         showCheckmark: false,
                         selectedColor: Colors.red,
