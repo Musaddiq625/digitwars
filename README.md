@@ -1,16 +1,33 @@
-# digitwars_io
+# Digit Wars IO
 
-A new Flutter project.
+Inspired by [<b><u>Agar.io</u></b>](https://agar.io), this game is a strategic number absorption game where you grow by consuming smaller values while avoiding larger threats!
 
-## Getting Started
+## 🎮 Features
+- Dynamic color transitions and gradient effects
+- Theme selector in game settings
+- 4 Challenging Modes: Easy (30 enemies), Medium (40), Hard (50), Extreme (Endless)
+- Dynamic power progression system
+- Lives system with invincibility frames
+- Real-time minimap for tactical awareness
+- Hypnotic visual effects with custom shaders
+- Visually Stunning Themes:
+    • 🌌 Cosmic Nebula
+    • 🌊 Deep Ocean
+    • 🌅 Sunset Paradise
+    • 🎇 Northern Lights
+    • 🏜️ Desert Dusk
 
-This project is a starting point for a Flutter application.
+## 🕹️ How to Play
+1. Click and Drag to move your core
+2. Absorb numbers smaller than your current level
+3. Avoid larger numbers that can damage you
+4. You have 3 lives
+5. Survive until time runs out
 
-A few resources to get you started if this is your first Flutter project:
+## 🚀 Getting Started
+Click Play → Choose Mode → Start!
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🔧 Technical Highlights
+Built with Flutter • Custom physics engine • Platform-adaptive storage • Responsive UI • No third-party libraries/packages
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Made with ❤️ by Musaddiq625
