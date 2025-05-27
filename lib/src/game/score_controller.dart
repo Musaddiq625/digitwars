@@ -74,8 +74,14 @@ class ScoreController {
     await localDB.setValue(CookiesConstants.hitFirstTime, 'true');
   }
 
-  static Future<bool> get getIsHitFirstTimeBool async =>
-      await localDB.getValue(CookiesConstants.hitFirstTime) == null;
+  static Future<bool?> get getIsHitFirstTimeBool async {
+    final val = await localDB.getValue(CookiesConstants.hitFirstTime);
+    if (val == null) {
+      return null;
+    } else {
+      return val == 'true';
+    }
+  }
 }
 
 class Score {
