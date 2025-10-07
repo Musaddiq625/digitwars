@@ -1,4 +1,4 @@
-# Digit Wars IO
+# DigitWars IO
 
 Inspired by [<b><u>Agar.io</u></b>](https://agar.io), this game is a strategic number absorption game where you grow by consuming smaller values while avoiding larger threats!
 
